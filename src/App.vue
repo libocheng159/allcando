@@ -1,0 +1,290 @@
+<template>
+  <!-- 全屏背景应用容器 -->
+  <v-app class="vapp-fullscreen-background" style="overflow: hidden;" :class="{ 'radius-before': !xs }"
+    :style="xs ? { height: '100%', width: '100%', top: '0', left: '0' } : (sm ? { height: '98%', width: '98%', top: '1%', left: ' 1%' } : { height: '96.6%', width: '99%', top: '1.7%', left: ' 0.5%' })">
+    <!-- 加载动画 -->
+    <transition name="fade">
+      <div class="loading" v-show="isloading">
+        <loader></loader>
+      </div>
+    </transition>
+    <!-- 背景视频 -->
+    <video autoplay loop muted class="video-bg" id="bg-video" ref="VdPlayer"
+      :style="xs ? { height: '100%', width: '100%', top: '0', left: '0' } : (sm ? { height: '98%', width: '98%', top: '1%', left: ' 1%', 'border-radius': '16px' } : { height: '96.6%', width: '99%', top: '1.7%', left: ' 0.5%', 'border-radius': '16px', })">
+      <source :src=videosrc type="video/mp4">
+    </video>
+
+    <!-- 清屏开关 -->
+    <div class="floating-switch-container">
+      <v-switch v-model="isClearScreen" inset :style="xs ? { 'transform': 'scale(0.6) translateX(15%)' } : {}"
+        class="floating-switch" @mouseover="expandSwitch" @mouseleave="collapseSwitch"></v-switch>
+    </div>
+
+
+
+    <div v-show="!isloading && !isClearScreen" :style="xs || sm ? { 'overflow-y': 'auto', 'overflow-x': 'hidden' } : {}">
+      <v-row>
+        <!-- 左侧个人信息栏 -->
+        <v-col cols="12" md="3" lg="3" class="lbc-left" align="center">
+          <!-- 欢迎 -->
+          <div :style="xs || sm ? { 'font-size': '2.3rem' } : { 'display': 'none' }" class="lbc-left-welcome">{{
+            configdata.welcometitle }}</div>
+          <!-- 头像及音乐播放器 -->
+          <v-avatar class="lbc-left-avatar" :size="xs || sm ? 120 : 140"
+            :style="xs || sm ? { 'margin-top': '0' } : { 'margin-top': '2rem' }" @mouseenter="musicplayershow(1)"
+            @mouseleave="musicplayershow(0)">
+            <v-img :class="{ 'lbc-spin': isPlaying }" alt="Lbc" :src=configdata.avatar></v-img>
+            <!-- 由于当ismusicplayer显示后，fadein无效果，所以需要设置一个过渡动画 -->
+            <transition name="fade">
+              <v-card v-show="ismusicplayer" class="musicplayer" :class="{ 'fade-in': ismusicplayer }" variant="tonal">
+                <div v-if="audioLoading" class="loading-spinner">
+                  <v-progress-circular indeterminate></v-progress-circular>
+                </div>
+                <span ref="audiotitle" class="musicplayer-text" style="top: 1.6rem;font-weight: bolder;">{{
+                  musicinfo?.[0]?.title }}</span>
+                <span ref="audioauthor" class="musicplayer-text" style="bottom: 1.4rem;">{{ musicinfo?.[0]?.author
+                  }}</span>
+                <audio v-show="false" ref="audioPlayer" :src="musicinfo?.[0]?.url" @waiting="onWaiting"
+                  @canplay="onCanPlay">
+                </audio>
+                <v-btn :size="xs || sm ? 22 : 30" color="#999999" icon @click="previousTrack()">
+                  <v-icon>mdi-skip-previous</v-icon>
+                </v-btn>
+                <v-btn :size="xs || sm ? 35 : 48" color="#999999" icon @click="togglePlay()">
+                  <v-icon>{{ isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+                </v-btn>
+                <v-btn :size="xs || sm ? 22 : 30" color="#999999" icon @click="nextTrack()">
+                  <v-icon>mdi-skip-next</v-icon>
+                </v-btn>
+              </v-card>
+            </transition>
+          </v-avatar>
+
+          <div class="mt-4 mb-2 text-center" style="max-width: 90%; color: var(--lbc-vcard-color);">
+            
+            <h2 class="text-h5 font-weight-bold mb-2">
+              {{ configdata.personalInfo?.name }}
+            </h2>
+
+            <div class="d-flex align-center justify-center my-1" style="font-size: 0.95rem; opacity: 0.9;">
+              <v-icon size="small" class="mr-2">mdi-school</v-icon>
+              <span>{{ configdata.personalInfo?.school }}</span>
+            </div>
+
+            <div class="d-flex align-center justify-center my-1" style="font-size: 0.95rem; opacity: 0.9;">
+              <v-icon size="small" class="mr-2">mdi-card-account-details-outline</v-icon>
+              <span class="text-truncate" style="max-width: 250px;">{{ configdata.personalInfo?.bio }}</span>
+            </div>
+
+            <div class="d-flex align-center justify-center my-1" style="font-size: 0.95rem; opacity: 0.9;">
+              <v-icon size="small" class="mr-2">mdi-cake-variant</v-icon>
+              <span>{{ configdata.personalInfo?.birthday }}</span>
+            </div>
+
+          </div>
+
+<div class="ma-5" :style="xs ? { 'width': '270px' } : { 'width': '300px' }">
+  <goal-notes :cloud-goals="configdata && configdata.goals" />
+</div>
+
+          <v-container class="lbc-left-socialIconsContainer">
+            <v-row align="center" justify="center">
+              <v-col class="pa-1" cols="auto" v-for="(item, index) in socialPlatformIcons" :key="index">
+                
+                <v-menu 
+                  open-on-hover 
+                  location="top" 
+                  :disabled="!['mdi-wechat', 'mdi-qqchat'].includes(item.icon)"
+                  transition="slide-y-transition"
+                  :close-on-content-click="false"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-btn 
+                      v-bind="props" 
+                      :size="xs ? 25 : 33" 
+                      variant="tonal" 
+                      color="var(--lbc-vcard-color)"
+                      class="ma-1 lbc-social-bticon" 
+                      icon 
+                      :href="!['mdi-wechat', 'mdi-qqchat'].includes(item.icon) ? item.link : undefined" 
+                      :target="!['mdi-wechat', 'mdi-qqchat'].includes(item.icon) ? '_blank' : undefined"
+                    >
+                      <v-icon :icon="item.icon" :size="xs ? 20 : 25" class="social-bticon-icon"></v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-card 
+                    v-if="['mdi-wechat', 'mdi-qqchat'].includes(item.icon)" 
+                    class="pa-4 d-flex flex-column align-center justify-center" 
+                    rounded="xl" 
+                    elevation="10"
+                    style="backdrop-filter: blur(20px); background-color: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255,255,255,0.5);"
+                    min-width="220"
+                  >
+                    <div class="text-subtitle-1 font-weight-bold mb-2" style="color: #333; letter-spacing: 1px;">
+                      <v-icon size="small" class="mr-1" :color="item.icon === 'mdi-wechat' ? 'green' : 'blue'">
+                        {{ item.icon }}
+                      </v-icon>
+                      {{ item.icon === 'mdi-wechat' ? '微信扫一扫' : 'QQ 扫一扫' }}
+                    </div>
+
+                    <v-img 
+                      :src="item.link" 
+                      width="180" 
+                      height="180" 
+                      cover 
+                      class="rounded-lg elevation-2 mb-2"
+                      style="border: 2px solid white;"
+                    ></v-img>
+
+                    <div class="text-caption text-grey">
+                      {{ item.icon === 'mdi-wechat' ? '添加好友 · 围观朋友圈' : '添加好友 · 在线交流' }}
+                    </div>
+                  </v-card>
+                </v-menu>
+
+              </v-col>
+            </v-row> 
+            <v-row align="center" justify="center" class="setting">
+              <v-col class="ma-1" cols="auto">
+                <v-speed-dial :location="xs || sm ? 'top center' : 'right center'" transition="slide-y-transition">
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-fab style="width: 2.5rem;height: 2.5rem;" color="var(--lbc-vcard-color)" variant="tonal"
+                      v-bind="activatorProps" icon="mdi-cog"></v-fab>
+                  </template>
+                  <v-btn variant="tonal" class="setbtn" key="1" icon="mdi-key-chain" @click="dialog1 = true" size="31"
+                    color="var(--lbc-vcard-color)"></v-btn>
+                  <v-btn variant="tonal" class="setbtn" key="2" icon="mdi-information" @click="dialog2 = true" size="31"
+                    color="var(--lbc-vcard-color)"></v-btn>
+                  <v-btn variant="tonal" class="setbtn" key="3" icon="$error" size="31"
+                    color="var(--lbc-vcard-color)"></v-btn>
+                  <v-btn variant="tonal" class="setbtn" key="gh-token" icon="mdi-key-variant" @click="saveGithubToken" size="31"
+                    color="orange" title="绑定 GitHub Token"></v-btn>
+                  <v-btn variant="tonal" class="setbtn" key="gh-sync" icon="mdi-cloud-upload" @click="syncToCloud" size="31"
+                    color="blue" title="同步到云端"></v-btn>
+                </v-speed-dial>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-col>
+
+        <v-col cols="12" md="9" lg="9" style="height: 100vh;" :style="xs || sm ? {} : { 'overflow': 'auto' }">
+          <homeright :configdata=configdata :formattedTime=formattedTime :formattedDate=formattedDate
+            :projectcards=projectcards></homeright>
+        </v-col>
+      </v-row>
+    </div>
+
+    <v-dialog v-model="dialog1" width="1000" heihght="700">
+      <v-card elevation="3" style="backdrop-filter: blur(10px);">
+        <v-tabs v-model="tab" :items="tabs" align-tabs="center" height="60" slider-color=var(--lbc-vcard-color)>
+          <template v-slot:tab="{ item }">
+            <v-tab :prepend-icon="item.icon" :text="item.text" :value="item.value" class="text-none"></v-tab>
+          </template>
+
+          <template v-slot:item="{ item }">
+            <v-tabs-window-item :value="item.value" class="pa-4">
+              <div v-if="item.value == 'tab-3' && musicinfoLoading" class="loading-spinner" align="center">
+                <v-progress-circular indeterminate></v-progress-circular>
+              </div>
+              <!-- 通过组件绑定不同tab项的组件 -->
+              <component v-if="item.value != 'tab-3' || (item.value == 'tab-3' && !musicinfoLoading)" :is=item.component
+                @cancel="handleCancel" :musicinfo="item.value == 'tab-3' ? musicinfo : []"
+                :currentIndex="item.value == 'tab-3' ? playlistIndex : null" :isPlaying="item.value == 'tab-3' ? isPlaying : null"
+                :audioPlayer="item.value == 'tab-3' ? audioPlayer : null" :fromLyrics="item.value == 'tab-3' ? lyrics : null"
+                :audioLoading="item.value == 'tab-3' ? audioLoading : null" @update:current-index="updateCurrentIndex"
+                @update:is-playing="updateIsPlaying" @update:current-lyrics="updateLyrics"></component>
+            </v-tabs-window-item>
+          </template>
+        </v-tabs>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialog2" width="700" heihght="500">
+      <v-card class="ma-3 pa-2" hover variant="tonal" rounded="lg"
+        style="text-align: center;backdrop-filter: blur(10px);">
+        <template v-slot:title>
+          <span class="lbc-card-title">关于</span>
+        </template>
+        <div style="display: flex;flex-direction: column;align-items: center;">
+          <v-card class="ma-3 pa-2" hover variant="tonal" max-width="400" rounded="lg" style="text-align: center;">
+            <template v-slot:subtitle>
+              <span class="lbc-card-subtitle">本页基于以下技术及服务搭建</span>
+            </template>
+            <div>
+              <v-tooltip v-for="(item, index) in stackicons" :key="index" v-model="item.model" location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn icon v-bind="props" :color=item.color rounded="lg" class="ma-1 stack-btn" size="35">
+                    <v-icon size="25" color="white">{{ item.icon }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>{{ item.tip }}</span>
+              </v-tooltip>
+              <!-- 自定义 -->
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" rounded="lg" class="ma-1 stack-btn" size="35">
+                    <v-avatar image="/img/stackicon/vite.svg" rounded="0" size="23"></v-avatar>
+                  </v-btn>
+                </template>
+                <span>vite</span>
+              </v-tooltip>
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" rounded="lg" class="ma-1 stack-btn" size="35" color="#254B7C">
+                    <span style="font-size: 8px;font-weight: bolder;">{less}</span>
+                  </v-btn>
+                </template>
+                <span>less</span>
+              </v-tooltip>
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" rounded="lg" class="ma-1 stack-btn" size="35">
+                    <v-avatar image="/img/stackicon/mdi.svg" rounded="0" size="35"></v-avatar>
+                  </v-btn>
+                </template>
+                <span>mdi</span>
+              </v-tooltip>
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" rounded="lg" class="ma-1 stack-btn" size="35">
+                    <v-avatar image="/img/stackicon/chartjs.png" rounded="0" size="23"></v-avatar>
+                  </v-btn>
+                </template>
+                <span>chartjs</span>
+              </v-tooltip>
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" rounded="lg" class="ma-1 stack-btn" size="35" color="#0F1225">
+                    <v-avatar image="/img/stackicon/meting.png" rounded="0" size="23"></v-avatar>
+                  </v-btn>
+                </template>
+                <span>meting</span>
+              </v-tooltip>
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" rounded="lg" class="ma-1 stack-btn" size="35" color="#070707">
+                    <v-avatar image="/img/stackicon/uiverse.png" rounded="0" size="23"></v-avatar>
+                  </v-btn>
+                </template>
+                <span>uiverse</span>
+              </v-tooltip>
+            </div>
+          </v-card>
+
+          <p class="ma-6">
+            <span v-for="(item, index) in configdata.statement" :key="index">
+              {{ item }}<br>
+            </span>
+          </p>
+        </div>
+      </v-card>
+    </v-dialog>
+  </v-app>
+</template>
+
+<script src="./app.js"></script>
+<style scoped>
+@import url(/css/app.less);
+@import url(/css/mobile.less);
+</style>
