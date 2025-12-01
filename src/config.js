@@ -9,6 +9,12 @@ const config = {
 
 	avatar: "/img/avatar.jpg", // 头像
 	welcometitle: "Happy every day", // 标题
+	personalInfo: {
+    name: "Bocheng Li", 
+    school: "WHU CAS",
+    bio: "我听见我的心脏在跳动",
+    birthday: "2003-01-14" // 或者 2000-01-01
+  	},
 
 	// 颜色配置
 	color: {
@@ -19,37 +25,37 @@ const config = {
 	},
 
 	goals: {
-		// 短期目标
-		shortTerm: [
-			{
-				id: "s-001",
-				date: "2023-12-01 09:30",
-				title: "重构 Leleo 主页",
-				content: "完成组件化拆分，上线便利贴功能，优化移动端适配。",
-			},
-			{
-				id: "s-002",
-				date: "2023-12-15 14:00",
-				title: "学习 TypeScript",
-				content: "看完官方文档，并在一个小项目中实践。",
-			},
-		],
-		// 长期目标
-		longTerm: [
-			{
-				id: "l-001",
-				date: "2025-05-20 12:00",
-				title: "Full Stack 进阶",
-				content: "深入理解后端架构，能够独立设计并部署高并发系统。",
-			},
-			{
-				id: "l-002",
-				date: "2026-01-01 00:00",
-				title: "周游世界",
-				content: "存够旅游基金，去冰岛看极光，去日本看樱花。",
-			},
-		],
-	},
+        // 短期目标 (注意：deadline 是必须的，格式为 YYYY-MM-DD HH:mm)
+        shortTerm: [
+            {
+                id: "s-001",
+                title: "重构 Leleo 主页",
+                deadline: "2025-12-05 23:59", 
+            },
+            {
+                id: "s-002",
+                title: "学习 TypeScript",
+                deadline: "2025-12-01 12:00", // 如果这个时间早于现在，它会显示红色“已过期”或被清理
+            },
+        ],
+        // 长期目标 (建议加上 createDate 和 deadline)
+        longTerm: [
+            {
+                id: "l-001",
+                title: "Full Stack 进阶",
+                content: "深入理解后端架构，能够独立设计并部署高并发系统。",
+                createDate: "2023-12-01", // 始于
+                deadline: "2025-05-20",   // 终于
+            },
+            {
+                id: "l-002",
+                title: "周游世界",
+                content: "存够旅游基金，去冰岛看极光，去日本看樱花。",
+                createDate: "2024-01-01",
+                deadline: "2030-01-01",
+            },
+        ],
+    },
 
 	
 

@@ -60,10 +60,32 @@
             </transition>
           </v-avatar>
 
+          <div class="mt-4 mb-2 text-center" style="max-width: 90%; color: var(--leleo-vcard-color);">
+            
+            <h2 class="text-h5 font-weight-bold mb-2">
+              {{ configdata.personalInfo?.name }}
+            </h2>
 
-          <div class="ma-5" :style="xs ? { 'width': '270px' } : { 'width': '300px' }">
-            <goal-notes />
+            <div class="d-flex align-center justify-center my-1" style="font-size: 0.95rem; opacity: 0.9;">
+              <v-icon size="small" class="mr-2">mdi-school</v-icon>
+              <span>{{ configdata.personalInfo?.school }}</span>
+            </div>
+
+            <div class="d-flex align-center justify-center my-1" style="font-size: 0.95rem; opacity: 0.9;">
+              <v-icon size="small" class="mr-2">mdi-card-account-details-outline</v-icon>
+              <span class="text-truncate" style="max-width: 250px;">{{ configdata.personalInfo?.bio }}</span>
+            </div>
+
+            <div class="d-flex align-center justify-center my-1" style="font-size: 0.95rem; opacity: 0.9;">
+              <v-icon size="small" class="mr-2">mdi-cake-variant</v-icon>
+              <span>{{ configdata.personalInfo?.birthday }}</span>
+            </div>
+
           </div>
+
+<div class="ma-5" :style="xs ? { 'width': '270px' } : { 'width': '300px' }">
+  <goal-notes :cloud-goals="configdata && configdata.goals" />
+</div>
 
           <v-container class="leleo-left-socialIconsContainer">
             <v-row align="center" justify="center">
@@ -87,6 +109,10 @@
                     color="var(--leleo-vcard-color)"></v-btn>
                   <v-btn variant="tonal" class="setbtn" key="3" icon="$error" size="31"
                     color="var(--leleo-vcard-color)"></v-btn>
+                  <v-btn variant="tonal" class="setbtn" key="gh-token" icon="mdi-key-variant" @click="saveGithubToken" size="31"
+                    color="orange" title="绑定 GitHub Token"></v-btn>
+                  <v-btn variant="tonal" class="setbtn" key="gh-sync" icon="mdi-cloud-upload" @click="syncToCloud" size="31"
+                    color="blue" title="同步到云端"></v-btn>
                 </v-speed-dial>
               </v-col>
             </v-row>
