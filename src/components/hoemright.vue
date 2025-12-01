@@ -70,13 +70,13 @@
           <v-container>
             <v-row>
               <v-col
-                v-for="(item,key) in projectcards"
+                v-for="(item,key) in projectcards" :key="key"
                 cols="6"
                 md="4"
                 lg="3"
                 :style="xs?{'padding': '6px'}:{}"
               >
-                <v-card class="">
+                <v-card class="ma-2" hover>
                   <v-img
                     aspect-ratio="1.7778"
                     :src= item.img
