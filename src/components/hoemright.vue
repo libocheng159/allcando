@@ -233,7 +233,7 @@ export default {
 	backdrop-filter: blur(var(--lbc-blur));
 	border-radius: 5%;
 	color: var(--lbc-vcard-color);
-	overflow: hidden;proxy
+	overflow: hidden;
 }
 .search-bar-glass :deep(.v-field) {
     border: 1px solid rgba(255, 255, 255, 0.2);
