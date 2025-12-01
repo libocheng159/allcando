@@ -4,6 +4,7 @@ import tab1 from './components/tabs/tab1.vue';
 import tab2 from './components/tabs/tab2.vue';
 import tab3 from './components/tabs/tab3.vue';
 import loader from './components/loader.vue';
+import GoalNotes from './components/GoalNotes.vue';
 import polarchart from './components/polarchart.vue';
 import config from './config.js';
 import { getCookie } from './utils/cookieUtils.js';
@@ -12,7 +13,7 @@ import { useDisplay } from 'vuetify'
 
 export default {
   components: {
-    tab1,tab2,tab3,loader,homeright,typewriter,polarchart
+    tab1,tab2,tab3,loader,homeright,typewriter,polarchart,GoalNotes
   },
   setup() {
     const { xs,sm,md } = useDisplay();
