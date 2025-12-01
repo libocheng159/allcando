@@ -46,7 +46,7 @@
     <div class="section-container long-term-section mt-4">
       <div class="section-title">
         <span><v-icon icon="mdi-flag-variant" color="#d9534f" size="small"></v-icon> 长期愿景</span>
-        <v-btn icon="mdi-plus" size="x-small" variant="text" color="#d9534f" @click="openDialog('long')"></v-btn>
+        <v-btn icon="mdi-plus" size="x-small" variant="text" color="#d9534f" :disabled="longGoals.length >= 3" @click="openDialog('long')"></v-btn>
       </div>
 
       <div class="long-cards-grid">
@@ -166,7 +166,7 @@ onMounted(() => {
 
 // 2. 数据加载逻辑 (云端优先 > 本地缓存 > 默认配置)
 const loadData = () => {
-  const localData = localStorage.getItem('leleo-goals-v2')
+  const localData = localStorage.getItem('lbc-goals-v2')
 
   // ★ 第一优先级：如果父组件传来了云端数据，直接使用
   if (props.cloudGoals && (props.cloudGoals.shortTerm?.length || props.cloudGoals.longTerm?.length)) {
@@ -196,7 +196,7 @@ watch(() => props.cloudGoals, (newGoals) => {
 
 // 4. 监听本地变化并缓存 (用于用户临时编辑，但在刷新后会被云端覆盖)
 watch(allGoals, (newVal) => {
-    localStorage.setItem('leleo-goals-v2', JSON.stringify(newVal))
+    localStorage.setItem('lbc-goals-v2', JSON.stringify(newVal))
 }, { deep: true })
 
 // --- 初始化工具函数 (统一格式化数据) ---
@@ -338,70 +338,101 @@ const isUrgent = (dateStr) => {
 </script>
 
 <style scoped>
+/* === 容器布局 === */
 .goals-wrapper {
   width: 100%;
   box-sizing: border-box;
+  font-family: "Microsoft YaHei", "Heiti SC", sans-serif; /* 确保字体圆润 */
 }
 
-/* === 通用卡片样式 === */
+/* === 通用卡片样式 (核心优化：毛玻璃) === */
 .notebook-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  /* 背景改为半透明白色 + 高斯模糊 */
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px); 
+  -webkit-backdrop-filter: blur(12px);
+  
+  /* 边框改为半透明白色，制造玻璃质感 */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 16px; /* 圆角加大 */
+  
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1); /* 柔和的投影 */
   position: relative;
   overflow: hidden;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+}
+
+.notebook-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
 }
 
 /* 蓝色主题 (短期) */
 .blue-theme {
-  border-top: 4px solid #007bff;
-  min-height: 180px; /* 短期卡片高度 */
+  /* 去掉左侧/上侧粗边框，改用顶部渐变条 */
+  background: linear-gradient(to bottom, rgba(235, 245, 255, 0.8), rgba(255, 255, 255, 0.6));
+}
+/* 给蓝色卡片顶部加一个装饰条 */
+.blue-theme::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
 }
 
-/* 红色主题 (长期) */
+/* 红色主题 (长期) - 这里不单独设背景，后面用 grid 里的样式 */
 .red-theme {
-  border-left: 4px solid #d9534f;
-  background-color: #fffbfb;
+  /* 移除原本的 border-left，改用更现代的样式 */
+  border-left: none; 
 }
 
 /* === 短期目标区域 === */
 .card-header {
-  padding: 10px 15px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #eee;
+  padding: 12px 20px;
+  background: transparent; /* 透明背景，让渐变透出来 */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .today-date {
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: #333;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #2c3e50;
+  letter-spacing: 0.5px;
 }
 
 .limit-tip {
-  font-size: 10px;
-  color: #999;
+  font-size: 11px;
+  color: #666;
   margin-right: 8px;
+  font-weight: bold;
 }
 
 .add-btn-circle {
-  background-color: #007bff !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: white !important;
+  box-shadow: 0 2px 6px rgba(118, 75, 162, 0.4);
 }
 
 .todo-list {
-  padding: 5px 0;
+  padding: 8px 0;
 }
 
 .todo-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 15px;
-  border-bottom: 1px dashed #eee;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  transition: background 0.2s;
+}
+
+.todo-item:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .todo-item:last-child {
@@ -415,91 +446,122 @@ const isUrgent = (dateStr) => {
 }
 
 .item-text {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #333;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .item-time {
-  font-size: 10px;
-  color: #888;
-  margin-top: 2px;
+  font-size: 11px;
+  color: #7f8c8d;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
-.text-red { color: #d9534f; font-weight: bold; }
+.text-red { color: #ff6b6b; font-weight: bold; }
 
 .empty-state {
   text-align: center;
-  color: #aaa;
-  font-size: 12px;
-  padding: 20px;
+  color: #888;
+  font-size: 13px;
+  padding: 25px;
+  font-style: italic;
 }
 
-/* === 长期目标区域 === */
+/* === 长期目标区域 (重点优化) === */
+.section-container.long-term-section {
+  margin-top: 24px !important; /* 增加间距 */
+}
+
 .section-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  font-weight: bold;
-  color: #666;
-  margin-bottom: 8px;
-  padding: 0 5px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff; /* 改为白色，因为背景通常较深，或者加个文字阴影 */
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3); /* 增加文字阴影防止背景太亮看不清 */
+  margin-bottom: 12px;
+  padding: 0 8px;
+  letter-spacing: 1px;
 }
 
 .long-cards-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px; /* 增加卡片间距 */
 }
 
 .is-card {
-  padding: 15px;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.85); /* 长期目标稍微不透明一点，突出重要性 */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  position: relative;
 }
 
-.is-card:hover {
-  transform: translateX(3px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+/* 给长期卡片加个左侧装饰条，代替原来的粗边框 */
+.is-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
 }
 
 .card-actions {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 10px;
+  right: 10px;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  padding: 2px 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .is-card:hover .card-actions {
   opacity: 1;
 }
 
+/* ✨✨ 这里是你要的字体放大和样式优化 ✨✨ */
 .long-title {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 0 0 5px 0;
-  color: #d9534f;
+  font-size: 1.35rem; /* 放大字体 */
+  font-weight: 900;
+  margin: 0 0 8px 0;
+  /* 文字渐变效果 */
+  background: linear-gradient(45deg, #ff512f, #dd2476);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
 }
 
 .long-desc {
-  font-size: 0.85rem;
-  color: #666;
-  line-height: 1.4;
-  margin-bottom: 10px;
+  font-size: 0.95rem; /* 描述也稍微放大 */
+  color: #555;
+  line-height: 1.6; /* 增加行高，阅读更舒适 */
+  margin-bottom: 16px;
+  font-weight: 500;
 }
 
 .long-footer {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
-  border-top: 1px solid #eee;
-  padding-top: 5px;
+  border-top: 1px dashed rgba(0,0,0,0.1); /* 虚线分割 */
+  padding-top: 10px;
+  font-family: monospace; /* 等宽字体显示日期更有质感 */
 }
 
 .empty-state-text {
-  font-size: 12px;
-  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
   text-align: center;
   font-style: italic;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  margin-top: 10px;
 }
 </style>

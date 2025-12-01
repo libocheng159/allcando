@@ -8,7 +8,7 @@
       <div class="pa-3">
           <div style="display: flex;width: 100%;align-items: center;">
              <v-avatar
-              color=var(--leleo-vcard-color)
+              color=var(--lbc-vcard-color)
               rounded="0"
               :image="currentSong.pic"
               :size="xs?48:64"
@@ -22,7 +22,7 @@
             <v-slider style="margin-bottom: -22px;padding: 0;"
                   v-model="currentTime"
                   :max="duration"
-                  color=var(--leleo-vcard-color)
+                  color=var(--lbc-vcard-color)
                   thumb-size="12"
                   density="compact"
                   @update:modelValue="seek"
@@ -33,7 +33,7 @@
 
             <span 
             :style="xs?{'font-size':'10px'}:{'font-size':'12px'}" 
-            style="color:var(--leleo-vcard-color);"
+            style="color:var(--lbc-vcard-color);"
             >{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
             <!-- 控制区 -->
           </div>
@@ -62,11 +62,11 @@
           ref="songItems"
         >
           <v-list-item-content class="d-flex justify-space-between">
-            <v-list-item-title style="color: var(--leleo-vcard-color);">
+            <v-list-item-title style="color: var(--lbc-vcard-color);">
               <span style="margin-right: 12px;">{{ index+1 }}</span>
               <span>{{ song.title }}</span>
             </v-list-item-title>
-            <span style="font-size: 12px; color: var(--leleo-vcard-color);">{{ song.author }}</span>
+            <span style="font-size: 12px; color: var(--lbc-vcard-color);">{{ song.author }}</span>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -292,7 +292,7 @@ export default {
 
 .lyrics {
   width: 100%;
-  color: var(--leleo-vcard-color);
+  color: var(--lbc-vcard-color);
 }
 
 /* 列表样式 */

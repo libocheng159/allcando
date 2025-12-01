@@ -5,7 +5,7 @@
           :items="tabs"
           align-tabs="center"
           height="25"
-          slider-color=var(--leleo-vcard-color)
+          slider-color=var(--lbc-vcard-color)
         >
           <template v-slot:tab="{ item }">
             <v-tab
@@ -243,21 +243,21 @@ export default {
                 this.snackbar = true;
                 return;
             }
-            let leleodatabackground = this.getCookie("leleodatabackground");
+            let lbcdatabackground = this.getCookie("lbcdatabackground");
             delete this.radios.loaded;
             if(this.type == 'mobile'){
                 this.background.mobile.type= this.tab === 'tab-1'? 'pic' : 'video';
                 this.background.mobile.datainfo = this.radios;
-                if(leleodatabackground){
-                    this.background.pc = leleodatabackground.pc;
+                if(lbcdatabackground){
+                    this.background.pc = lbcdatabackground.pc;
                 }else{
                     this.background.pc = this.configdata.background.pc;
                 }
             }else{
                 this.background.pc.type= this.tab === 'tab-1'? 'pic' : 'video';
                 this.background.pc.datainfo = this.radios;
-                if(leleodatabackground){
-                    this.background.mobile = leleodatabackground.mobile;
+                if(lbcdatabackground){
+                    this.background.mobile = lbcdatabackground.mobile;
                 }else{
                     this.background.mobile = this.configdata.background.mobile;
                 }
@@ -266,7 +266,7 @@ export default {
             this.loading2 = true
             setTimeout(() => {
                 this.loading = false;
-                this.setCookie('leleodatabackground', this.background,0.005);
+                this.setCookie('lbcdatabackground', this.background,0.005);
                 location.reload();
             }, 800)   
         },
@@ -274,7 +274,7 @@ export default {
             this.loading1 = true
             setTimeout(() => {
                 this.loading = false;
-                this.eraseCookie('leleodatabackground');
+                this.eraseCookie('lbcdatabackground');
                 location.reload();
             }, 800) 
         },
@@ -358,13 +358,13 @@ video{
   border-radius: 4px; /* 设置滚动条圆角 */
 }
 .selectedStyle{
-    border: 2px solid var(--leleo-vcard-color);
+    border: 2px solid var(--lbc-vcard-color);
     
     box-shadow: 0 0 10px rgba(25, 118, 210, 0.5),;
 }
 
 .selected-item {
-  border-color: var(--leleo-vcard-color); /* 选中时的边框颜色 */
-  box-shadow: 0 0 10px var(--leleo-vcard-color); /* 选中时的阴影 */
+  border-color: var(--lbc-vcard-color); /* 选中时的边框颜色 */
+  box-shadow: 0 0 10px var(--lbc-vcard-color); /* 选中时的阴影 */
 }
 </style>

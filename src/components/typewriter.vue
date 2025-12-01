@@ -1,5 +1,5 @@
 <template>
-    <div class="leleo-typewriter" style="text-align: center;"><span class="qm">“ </span><span ref="text" class="msg"></span><span class="qm"> ”</span></div>
+    <div class="lbc-typewriter" style="text-align: center;"><span class="qm">“ </span><span ref="text" class="msg"></span><span class="qm"> ”</span></div>
 </template>
 
 <script setup>
@@ -17,7 +17,7 @@ onMounted(() => {
     }
     new (TypeIt)(text.value, {
         strings: configdata.typeWriterStrings,
-        cursorChar: "<span class='cursorChar' style='font-size: 26px;color: var(--leleo-vcard-color);'>|<span>",//用于光标的字符。HTML也可以
+        cursorChar: "<span class='cursorChar' style='font-size: 26px;color: var(--lbc-vcard-color);'>|<span>",//用于光标的字符。HTML也可以
         speed: 150,
         lifeLike: true,// 使打字速度不规则
         cursor: true,//在字符串末尾显示闪烁的光标
@@ -30,7 +30,7 @@ onMounted(() => {
  
 <style scoped>
 .msg, .qm{
-    color: var(--leleo-vcard-color);
+    color: var(--lbc-vcard-color);
     letter-spacing: 2px;
     font-family: Arial, sans-serif;
     font-size: 25px;
@@ -48,7 +48,7 @@ onMounted(() => {
     }
 }
 @media (max-width: 960px){
-    .leleo-typewriter{
+    .lbc-typewriter{
         min-height: 76px;   
     }
     .msg, .qm{

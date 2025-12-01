@@ -19,7 +19,7 @@
             <v-slider
                 class="ml-5 mr-8"
                 label="背景亮度"
-                color=var(--leleo-vcard-color)
+                color=var(--lbc-vcard-color)
                 :max="100"
                 :min="50"
                 :step="0.5"
@@ -30,7 +30,7 @@
             <v-slider
                 class="ml-5 mr-8"
                 label="模糊度"
-                color=var(--leleo-vcard-color)
+                color=var(--lbc-vcard-color)
                 :max="20"
                 :min="0"
                 :thumb-size="xs?15:18"
@@ -72,7 +72,7 @@
     <v-snackbar
       :timeout="2000"
       variant="tonal"
-      color=var(--leleo-vcard-color)
+      color=var(--lbc-vcard-color)
       rounded="pill"
       v-model="snackbar"
     >
@@ -113,11 +113,11 @@ export default {
         this.configdata = JSON.parse(import.meta.env.VITE_CONFIG);
     }
     
-    let leleodata = this.getCookie("leleodata");
-    if(leleodata){
-        this.color = leleodata.color;
-        this.brightness = leleodata.brightness;
-        this.blur = leleodata.blur;
+    let lbcdata = this.getCookie("lbcdata");
+    if(lbcdata){
+        this.color = lbcdata.color;
+        this.brightness = lbcdata.brightness;
+        this.blur = lbcdata.blur;
     }else{
         this.color = this.configdata.color;
         this.brightness = this.configdata.brightness;
@@ -133,7 +133,7 @@ export default {
         setTimeout(() => {
             this.loading = false;
             // 注意数字String格式化
-            this.setCookie('leleodata', {color:this.color,brightness:String(this.brightness),blur:String(this.blur),backgroundblur:String(this.backgroundblur)},0.005);
+            this.setCookie('lbcdata', {color:this.color,brightness:String(this.brightness),blur:String(this.blur),backgroundblur:String(this.backgroundblur)},0.005);
             location.reload();
         }, 800)   
     },
@@ -141,7 +141,7 @@ export default {
         this.loading1 = true
         setTimeout(() => {
             this.loading = false;
-            this.eraseCookie('leleodata');
+            this.eraseCookie('lbcdata');
             location.reload();
         }, 800) 
           

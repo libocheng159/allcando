@@ -29,7 +29,7 @@ const config = {
         shortTerm: [
             {
                 id: "s-001",
-                title: "重构 Leleo 主页",
+                title: "重构 lbc 主页",
                 deadline: "2025-12-05 23:59", 
             },
             {
@@ -86,8 +86,8 @@ const config = {
 
 	//社交按钮
 	socialPlatformIcons: [
-		{ icon: "mdi-github", link: "https://www.github.com/leleo886" },
-		{ icon: "mdi-email", link: "mailto:leleo886@foxmail.com" },
+		{ icon: "mdi-github", link: "https://www.github.com/lbc886" },
+		{ icon: "mdi-email", link: "mailto:lbc886@foxmail.com" },
 		{ icon: "mdi-qqchat", link: "https://im.qq.com/" },
 		{ icon: "mdi-wechat", link: "https://wx.qq.com/" },
 		{ icon: "mdi-youtube", link: "https://www.youtube.com" },
@@ -220,8 +220,8 @@ const config = {
 			{
 				title: "世界很温柔《龙族》上杉绘梨衣",
 				preview:
-					"https://www.leleo.top/img/wallpaper/dynamic/%E4%B8%96%E7%95%8C%E5%BE%88%E6%B8%A9%E6%9F%94%E3%80%8A%E9%BE%99%E6%97%8F%E3%80%8B%E4%B8%8A%E6%9D%89%E7%BB%98%E6%A2%A8%E8%A1%A3/A2EF5E85-pre.webm",
-				url: "https://www.leleo.top/img/wallpaper/dynamic/%E4%B8%96%E7%95%8C%E5%BE%88%E6%B8%A9%E6%9F%94%E3%80%8A%E9%BE%99%E6%97%8F%E3%80%8B%E4%B8%8A%E6%9D%89%E7%BB%98%E6%A2%A8%E8%A1%A3/A2EF5E85.webm",
+					"https://www.lbc.top/img/wallpaper/dynamic/%E4%B8%96%E7%95%8C%E5%BE%88%E6%B8%A9%E6%9F%94%E3%80%8A%E9%BE%99%E6%97%8F%E3%80%8B%E4%B8%8A%E6%9D%89%E7%BB%98%E6%A2%A8%E8%A1%A3/A2EF5E85-pre.webm",
+				url: "https://www.lbc.top/img/wallpaper/dynamic/%E4%B8%96%E7%95%8C%E5%BE%88%E6%B8%A9%E6%9F%94%E3%80%8A%E9%BE%99%E6%97%8F%E3%80%8B%E4%B8%8A%E6%9D%89%E7%BB%98%E6%A2%A8%E8%A1%A3/A2EF5E85.webm",
 			},
 		],
 		videoMobile: [
@@ -253,7 +253,7 @@ const config = {
 			title: "Project 1",
 			subtitle: "1,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -262,7 +262,7 @@ const config = {
 			title: "Project 2",
 			subtitle: "2,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -271,7 +271,7 @@ const config = {
 			title: "Project 3",
 			subtitle: "3,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -280,7 +280,7 @@ const config = {
 			title: "Project 4",
 			subtitle: "4,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -289,7 +289,7 @@ const config = {
 			title: "Project 5",
 			subtitle: "5,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -298,7 +298,7 @@ const config = {
 			title: "Project 6",
 			subtitle: "6,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -307,7 +307,7 @@ const config = {
 			title: "Project 7",
 			subtitle: "7,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 		{
@@ -316,12 +316,12 @@ const config = {
 			title: "Project 8",
 			subtitle: "8,000 miles of wonder",
 			text: "If you see this line, I've managed to get your attention.",
-			url: "https://leleo.top",
+			url: "https://lbc.top",
 			show: false,
 		},
 	],
 
-	statement: ["备案号：XXICP备123456789号", "Copyright © 2025 Leleo"],
+	statement: ["备案号：XXICP备123456789号", "Copyright © 2025 lbc"],
 };
 
 export default config;

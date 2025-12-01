@@ -6,7 +6,6 @@ import tab3 from './components/tabs/tab3.vue';
 import loader from './components/loader.vue';
 import GoalNotes from './components/GoalNotes.vue';
 import config from './config.js';
-import { getCookie } from './utils/cookieUtils.js';
 import { setMeta, getFormattedTime, getFormattedDate, dataConsole } from './utils/common.js';
 import { useDisplay } from 'vuetify'
 
@@ -24,7 +23,7 @@ export default {
       isClearScreen: false,
       formattedTime: "",
       formattedDate: "",
-      configdata: config,
+      configdata: config, 
       dialog1: false,
       dialog2: false,
       personalizedtags: null,
@@ -71,9 +70,7 @@ export default {
     };
   },
   async mounted() {
-    // 使用 GitHub Pages 链接并加时间戳防止缓存
     const CLOUD_CONFIG_URL = 'https://libocheng159.github.io/website-data/config.json?v=' + new Date().getTime();
-
     this.isloading = true;
     try {
       console.log("正在连接云端配置...");
@@ -89,18 +86,12 @@ export default {
       console.error("❌ 网络请求错误，将使用本地默认配置", error);
     }
 
-    // -----------------------------------------------------------------------
-    // 数据同步与页面设置
-    // -----------------------------------------------------------------------
-
-    // 重新赋值这些变量，确保它们用的是(可能的)云端新数据
     this.projectcards = this.configdata.projectcards;
     this.socialPlatformIcons = this.configdata.socialPlatformIcons;
+    this.personalizedtags = this.configdata.tags;
 
-    // 控制台签名
+    // 控制台签名 & Meta 设置
     this.dataConsole();
-
-    // 设置 Meta 标签
     if (this.configdata.metaData) {
       this.setMeta(
         this.configdata.metaData.title,
@@ -109,101 +100,102 @@ export default {
         this.configdata.metaData.icon
       );
     }
-
-    // 设置 CSS 变量 (颜色、背景图/视频)
+    
     let imageurl = "";
     imageurl = this.setMainProperty(imageurl);
+    console.log("背景资源地址:", imageurl || this.videosrc);
 
 
-    // -----------------------------------------------------------------------
-    // 图片预加载
-    // -----------------------------------------------------------------------
     const loadImage = () => {
-      // 这里的 configdata 已经是云端数据了
-      const imageUrls = [
-        this.configdata.avatar,
-        ...(this.configdata.projectcards || []).map(item => item.img)
-      ].filter(url => url);
+        const imageUrls = [
+          this.configdata.avatar,
+          ...(this.configdata.projectcards || []).map(item => item.img)
+        ].filter(url => url);
 
-      return new Promise((resolve, reject) => {
-        const imagePromises = imageUrls.map((url) => {
-          return new Promise((resolve) => {
-            const imgs = new Image();
-            imgs.src = url;
-            imgs.onload = () => resolve();
-            imgs.onerror = () => resolve();
+        return new Promise((resolve, reject) => {
+          const imagePromises = imageUrls.map((url) => {
+            return new Promise((resolve) => {
+                const imgs = new Image();
+                imgs.src = url;
+                // 无论成功失败都 resolve，防止页面卡死
+                imgs.onload = () => resolve();
+                imgs.onerror = () => resolve(); 
+            });
+          })
+
+          // 设置超时机制：3秒
+          const timeoutPromise = new Promise((resolve) => {
+            setTimeout(() => { resolve(); }, 3000);
           });
-        })
-
-        // 设置超时机制：3秒
-        const timeoutPromise = new Promise((resolve) => {
-          setTimeout(() => { resolve(); }, 3000);
-        });
-
-        // 赛跑逻辑
-        Promise.race([Promise.all(imagePromises), timeoutPromise]).then(() => {
-          if (imageurl) {
-            const img = new Image();
-            img.src = imageurl;
-            img.onload = () => { resolve(); };
-            img.onerror = () => { resolve(); };
-          } else {
-            const video = this.$refs.VdPlayer;
-            if (video) {
-              video.onloadedmetadata = () => { resolve(); };
-              video.onerror = () => { resolve(); };
-              setTimeout(() => { resolve(); }, 1000);
+          
+          // 竞速：加载完成 vs 超时
+          Promise.race([Promise.all(imagePromises), timeoutPromise]).then(()=>{
+            if(imageurl){
+              // 图片背景
+              const img = new Image();
+              img.src = imageurl;
+              img.onload = () => { resolve(); };
+              img.onerror = () => { resolve(); };
             } else {
-              resolve();
+              // 视频背景
+              const video = this.$refs.VdPlayer;
+              if (video) {
+                  video.onloadedmetadata = () => { resolve(); };
+                  video.onerror = () => { resolve(); };
+                  setTimeout(() => { resolve(); }, 1000); 
+              } else {
+                  resolve();
+              }
             }
-          }
-        })
-      });
-    };
+          })
+        });
+     };
 
     loadImage().then(() => {
-      this.formattedTime = this.getFormattedTime(new Date());
-      this.formattedDate = this.getFormattedDate(new Date());
-      setTimeout(() => {
-        this.isloading = false;
-      }, 500);
-    }).catch((err) => {
-      console.error('资源加载异常:', err);
-      setTimeout(() => {
-        this.isloading = false;
-      }, 100);
-    });
+        this.formattedTime =  this.getFormattedTime(new Date());
+        this.formattedDate =  this.getFormattedDate(new Date());
+        // 延迟关闭 Loading
+        setTimeout(() => {
+          this.isloading = false;
+        }, 500);          
+      }).catch((err) => {
+        console.error('资源加载异常:', err);
+        setTimeout(() => {
+          this.isloading = false;
+        }, 100);  
+      });
+ 
+      setInterval(() => {
+        this.formattedTime =  this.getFormattedTime(new Date()) ;
+      }, 1000);
 
-    setInterval(() => {
-      this.formattedTime = this.getFormattedTime(new Date());
-    }, 1000);
-
-    if (this.configdata.musicPlayer) {
-      await this.getMusicInfo();
-      if (this.$refs.audioPlayer) {
-        this.setupAudioListener();
+      // 加载音乐
+      if (this.configdata.musicPlayer) {
+          await this.getMusicInfo();
+          if (this.$refs.audioPlayer) {
+              this.setupAudioListener();
+          }
       }
-    }
   },
 
   beforeDestroy() {
-    this.$refs.audioPlayer.removeEventListener('ended', this.nextTrack);
+    this.$refs.audioPlayer.removeEventListener('ended',  this.nextTrack);
   },
 
-  watch: {
-    isClearScreen(val) {
-      if (!this.videosrc) {
+  watch:{
+    isClearScreen(val){
+      if(!this.videosrc){
         return
       }
-      if (val) {
-        this.$refs.VdPlayer.style.zIndex = 0;
+      if(val){
+        this.$refs.VdPlayer.style.zIndex = 0; 
         this.$refs.VdPlayer.controls = true;
-      } else {
-        this.$refs.VdPlayer.style.zIndex = -100;
+      }else{
+        this.$refs.VdPlayer.style.zIndex = -100; 
         this.$refs.VdPlayer.controls = false;
       }
     },
-    audioLoading(val) {
+    audioLoading(val){
       this.isPlaying = !val;
     }
   },
@@ -216,15 +208,10 @@ export default {
       return this.$refs.audioPlayer;
     }
   },
-
+  
   methods: {
-    getCookie, setMeta, getFormattedTime, getFormattedDate, dataConsole,
-
-    // =========================================================
-    // 👇👇👇 新增：云端同步相关的三个核心方法 👇👇👇
-    // =========================================================
-
-    // 1. 保存 Token
+    setMeta,getFormattedTime,getFormattedDate,dataConsole, 
+    // 1. 保存 Token 到本地
     saveGithubToken() {
       const token = prompt("请输入你的 GitHub Access Token (ghp_开头):");
       if (token) {
@@ -233,7 +220,7 @@ export default {
       }
     },
 
-    // 2. 同步数据到 GitHub (修复了数组/对象转换问题)
+    // 2. 同步数据到 GitHub
     async syncToCloud() {
       const token = localStorage.getItem('gh_token');
       if (!token) {
@@ -243,7 +230,6 @@ export default {
 
       this.isloading = true;
 
-      // ★★★ 你的仓库配置 ★★★
       const USER = 'libocheng159';
       const REPO = 'website-data';
       const PATH = 'config.json';
@@ -251,37 +237,35 @@ export default {
       const API_URL = `https://api.github.com/repos/${USER}/${REPO}/contents/${PATH}`;
 
       try {
-        // 第一步：获取 SHA
+        // 第一步：获取 SHA (必须)
         const getRes = await fetch(API_URL, {
           headers: {
             'Authorization': `token ${token}`,
             'Accept': 'application/vnd.github.v3+json'
           }
         });
-
+        
         if (!getRes.ok) throw new Error("连接 GitHub 失败，请检查 Token 或 仓库名");
         const fileData = await getRes.json();
         const sha = fileData.sha;
 
-        // 第二步：准备数据
-        // 优先读取本地最新的缓存
-        const localGoalsStr = localStorage.getItem('leleo-goals-v2');
+        // 第二步：准备要上传的数据
+        const localGoalsStr = localStorage.getItem('lbc-goals-v2');
         let sourceGoals = this.configdata.goals; // 默认用当前的
-
-        if (localGoalsStr) {
-          console.log("正在从本地缓存读取最新目标数据...");
-          sourceGoals = JSON.parse(localGoalsStr);
+        
+        if(localGoalsStr) {
+            console.log("正在从本地缓存读取最新目标数据...");
+            sourceGoals = JSON.parse(localGoalsStr);
         }
 
-        // 构造新配置
         const newConfig = {
-          ...this.configdata,
-          // 使用 formatGoalsForExport 处理数据，确保格式正确
-          goals: this.formatGoalsForExport(sourceGoals)
+            ...this.configdata,
+            goals: this.formatGoalsForExport(sourceGoals) 
         };
 
-        // 第三步：上传 (Base64编码 + UTF8修复)
+        // 第三步：编码并上传
         const jsonStr = JSON.stringify(newConfig, null, 2);
+        // 使用 TextEncoder 解决中文乱码问题
         const utf8Bytes = new TextEncoder().encode(jsonStr);
         const contentBase64 = btoa(String.fromCharCode(...utf8Bytes));
 
@@ -292,7 +276,7 @@ export default {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message: 'update: via web client',
+            message: 'update: via web client', // 提交信息
             content: contentBase64,
             sha: sha,
             branch: 'main'
@@ -313,120 +297,92 @@ export default {
       }
     },
 
-    // 3. 数据格式化工具 (处理 Array vs Object 的问题)
     formatGoalsForExport(data) {
-      // 情况 A：数据来自 localStorage (是数组 Array) -> 需要拆分
-      if (Array.isArray(data)) {
-        return {
-          shortTerm: data
-            .filter(g => g.type === 'short')
-            .map(i => ({
-              id: i.id,
-              title: i.title,
-              deadline: i.deadline
-            })),
-          longTerm: data
-            .filter(g => g.type === 'long')
-            .map(i => ({
-              id: i.id,
-              title: i.title,
-              content: i.content,
-              createDate: i.createDate,
-              deadline: i.deadline
-            }))
-        };
-      }
-
-      // 情况 B：数据来自 configdata (已经是对象 Object) -> 清理一下即可
-      return {
-        shortTerm: (data.shortTerm || []).map(i => ({
-          id: i.id, title: i.title, deadline: i.deadline
-        })),
-        longTerm: (data.longTerm || []).map(i => ({
-          id: i.id, title: i.title, content: i.content,
-          createDate: i.createDate, deadline: i.deadline
-        }))
-      };
-    },
-
-    // =========================================================
-    // 👆👆👆 新增方法结束 👆👆👆
-    // =========================================================
-
-    setMainProperty(imageurl) {
-      const root = document.documentElement;
-      let leleodata = this.getCookie("leleodata");
-      if (leleodata) {
-        root.style.setProperty('--leleo-welcomtitle-color', `${leleodata.color.welcometitlecolor}`);
-        root.style.setProperty('--leleo-vcard-color', `${leleodata.color.themecolor}`);
-        root.style.setProperty('--leleo-brightness', `${leleodata.brightness}%`);
-        root.style.setProperty('--leleo-blur', `${leleodata.blur}px`);
-      } else {
-        root.style.setProperty('--leleo-welcomtitle-color', `${this.configdata.color.welcometitlecolor}`);
-        root.style.setProperty('--leleo-vcard-color', `${this.configdata.color.themecolor}`);
-        root.style.setProperty('--leleo-brightness', `${this.configdata.brightness}%`);
-        root.style.setProperty('--leleo-blur', `${this.configdata.blur}px`);
-      }
-
-      let leleodatabackground = this.getCookie("leleodatabackground");
-      // 使用 this.xs (Vue Options API 中会自动解包 setup 返回的 ref)
-      if (leleodatabackground) {
-        if (this.xs) {
-          if (leleodatabackground.mobile.type == "pic") {
-            root.style.setProperty('--leleo-background-image-url', `url('${leleodatabackground.mobile.datainfo.url}')`);
-            imageurl = leleodatabackground.mobile.datainfo.url;
-            return imageurl;
-          } else {
-            this.videosrc = leleodatabackground.mobile.datainfo.url;
-          }
-        } else {
-          if (leleodatabackground.pc.type == "pic") {
-            root.style.setProperty('--leleo-background-image-url', `url('${leleodatabackground.pc.datainfo.url}')`);
-            imageurl = leleodatabackground.pc.datainfo.url;
-            return imageurl;
-          } else {
-            this.videosrc = leleodatabackground.pc.datainfo.url;
-          }
+        
+        if (Array.isArray(data)) {
+            return {
+                shortTerm: data
+                    .filter(g => g.type === 'short')
+                    .map(i => ({
+                        id: i.id,
+                        title: i.title,
+                        deadline: i.deadline
+                    })),
+                longTerm: data
+                    .filter(g => g.type === 'long')
+                    .map(i => ({
+                        id: i.id,
+                        title: i.title,
+                        content: i.content,
+                        createDate: i.createDate,
+                        deadline: i.deadline
+                    }))
+            };
         }
 
-      } else {
-        if (this.xs) {
-          if (this.configdata.background.mobile.type == "pic") {
-            root.style.setProperty('--leleo-background-image-url', `url('${this.configdata.background.mobile.datainfo.url}')`);
-            imageurl = this.configdata.background.mobile.datainfo.url;
-            return imageurl;
-          } else {
-            this.videosrc = this.configdata.background.mobile.datainfo.url;
-          }
-        } else {
-          if (this.configdata.background.pc.type == "pic") {
-            root.style.setProperty('--leleo-background-image-url', `url('${this.configdata.background.pc.datainfo.url}')`);
-            imageurl = this.configdata.background.pc.datainfo.url;
-            return imageurl;
-          } else {
-            this.videosrc = this.configdata.background.pc.datainfo.url;
-          }
+        return {
+            shortTerm: (data.shortTerm || []).map(i => ({
+                id: i.id, title: i.title, deadline: i.deadline
+            })),
+            longTerm: (data.longTerm || []).map(i => ({
+                id: i.id, title: i.title, content: i.content, 
+                createDate: i.createDate, deadline: i.deadline
+            }))
+        };
+    },
 
+    setMainProperty(imageurl){
+      const root = document.documentElement;
+      if (this.configdata.color) {
+        root.style.setProperty('--lbc-welcomtitle-color', this.configdata.color.welcometitlecolor);
+        root.style.setProperty('--lbc-vcard-color', this.configdata.color.themecolor);
+      }
+      if (this.configdata.brightness) {
+        root.style.setProperty('--lbc-brightness', `${this.configdata.brightness}%`);
+      }
+      if (this.configdata.blur) {
+        root.style.setProperty('--lbc-blur', `${this.configdata.blur}px`);
+      }
+
+      // 2. 设置背景 (直接读取 configdata)
+      // 使用 this.xs 来判断设备类型
+      if(this.xs){
+        if(this.configdata.background.mobile.type == "pic"){
+          const mobileUrl = this.configdata.background.mobile.datainfo.url;
+          root.style.setProperty('--lbc-background-image-url', `url('${mobileUrl}')`);
+          imageurl = mobileUrl;
+          return imageurl;
+        }else{
+          this.videosrc = this.configdata.background.mobile.datainfo.url;
+        }
+      }else{
+        if(this.configdata.background.pc.type == "pic"){
+          const pcUrl = this.configdata.background.pc.datainfo.url;
+          root.style.setProperty('--lbc-background-image-url', `url('${pcUrl}')`);
+          imageurl = pcUrl;
+          return imageurl;
+        }else{
+          this.videosrc = this.configdata.background.pc.datainfo.url;
         }
       }
       return imageurl;
     },
 
-    projectcardsShow(key) {
-      this.projectcards.forEach((item, index) => {
-        if (index != key) {
+    projectcardsShow(key){
+      this.projectcards.forEach((item,index)=>{
+        if(index!= key){
           item.show = false;
         }
       })
     },
-    handleCancel() {
+    handleCancel(){
       this.dialog1 = false;
     },
-    jump(url) {
+    jump(url){
       window.open(url, '_blank').focus();
     },
-
-    async getMusicInfo() {
+    
+    async getMusicInfo(){
       this.musicinfoLoading = true;
       try {
         const response = await fetch(`https://api.i-meto.com/meting/api?server=${this.configdata.musicPlayer.server}&type=${this.configdata.musicPlayer.type}&id=${this.configdata.musicPlayer.id}`
@@ -439,10 +395,10 @@ export default {
       } catch (error) {
         console.error('请求失败:', error);
       }
-
+      
     },
     musicplayershow(val) {
-      this.ismusicplayer = val;
+        this.ismusicplayer = val;
     },
 
     setupAudioListener() {
@@ -481,7 +437,7 @@ export default {
     updateIsPlaying(isPlaying) {
       this.isPlaying = isPlaying;
     },
-    updateLyrics(lyrics) {
+    updateLyrics(lyrics){
       this.lyrics = lyrics;
     },
     // 监听等待事件（缓冲不足）

@@ -1,7 +1,7 @@
 .v-card{
-    backdrop-filter: blur(var(--leleo-blur));
+    backdrop-filter: blur(var(--lbc-blur));
     border-radius: 5%;
-    color: var(--leleo-vcard-color);
+    color: var(--lbc-vcard-color);
 }
 
 .vapp-fullscreen-background {
@@ -34,7 +34,7 @@
         object-fit: cover;
         margin: auto;
         background-clip: padding-box;
-        filter: brightness(var(--leleo-brightness));
+        filter: brightness(var(--lbc-brightness));
     }
     .loading{
         position: fixed;
@@ -55,7 +55,7 @@
         opacity: 0  
     }
 
-    .leleo-left{
+    .lbc-left{
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -64,7 +64,7 @@
         &-welcome{
             margin-top: 10px;
             width: 100%;
-            color: var(--leleo-welcomtitle-color);
+            color: var(--lbc-welcomtitle-color);
             padding: 0 2rem;
             font-family: "myfont";
         }
@@ -84,7 +84,7 @@
                 white-space: nowrap;
                 overflow: hidden;
             }
-            .leleo-spin {
+            .lbc-spin {
                 animation: spin 6s linear infinite;
             }
             .loading-spinner {
@@ -112,7 +112,7 @@
             }
         }
         &-socialIconsContainer{
-            .leleo-social-bticon:hover{
+            .lbc-social-bticon:hover{
                 transform: scale(1.2);
             }
         }
@@ -126,7 +126,7 @@
 /* 添加一个::before伪元素降低背景图片的亮度，而不会影响background元素的其他内容 */
 .vapp-fullscreen-background::before {
     content: "";
-    background-image: var(--leleo-background-image-url); 
+    background-image: var(--lbc-background-image-url); 
     transition: background-image 0.8s ease;
     background-size:cover;
     background-position: center;
@@ -135,7 +135,7 @@
     height: 100%;
     z-index: -1;
     /* 调整亮度值  */
-    filter: brightness(var(--leleo-brightness));
+    filter: brightness(var(--lbc-brightness));
 }
 .vapp-fullscreen-background.radius-before::before{
     border-radius: 16px;

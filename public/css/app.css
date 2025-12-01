@@ -1,0 +1,135 @@
+.v-card {
+  backdrop-filter: blur(var(--lbc-blur));
+  border-radius: 5%;
+  color: var(--lbc-vcard-color);
+}
+.vapp-fullscreen-background {
+  position: fixed;
+  background-color: #282c34;
+  z-index: -1;
+  /* 调整视频元素的样式，使其全屏作为背景 */
+}
+.vapp-fullscreen-background .floating-switch-container {
+  position: fixed;
+  right: 0;
+  z-index: 99;
+}
+.vapp-fullscreen-background .floating-switch {
+  transform: translateX(53%);
+  /* 初始状态下隐藏大部分 */
+  transition: transform 0.3s ease;
+}
+.vapp-fullscreen-background .floating-switch:hover {
+  transform: translateX(0);
+  /* 悬停时完全展开 */
+}
+.vapp-fullscreen-background .video-bg {
+  position: fixed;
+  z-index: -100;
+  object-fit: cover;
+  margin: auto;
+  background-clip: padding-box;
+  filter: brightness(var(--lbc-brightness));
+}
+.vapp-fullscreen-background .loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #282c34;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.vapp-fullscreen-background .fade-enter-active,
+.vapp-fullscreen-background .fade-leave-active {
+  transition: opacity 0.8s;
+}
+.vapp-fullscreen-background .fade-enter,
+.vapp-fullscreen-background .fade-leave-to {
+  opacity: 0;
+}
+.vapp-fullscreen-background .lbc-left {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+.vapp-fullscreen-background .lbc-left-welcome {
+  margin-top: 10px;
+  width: 100%;
+  color: var(--lbc-welcomtitle-color);
+  padding: 0 2rem;
+  font-family: "myfont";
+}
+.vapp-fullscreen-background .lbc-left-avatar .musicplayer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.vapp-fullscreen-background .lbc-left-avatar .musicplayer-text {
+  position: absolute;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.vapp-fullscreen-background .lbc-left-avatar .lbc-spin {
+  animation: spin 6s linear infinite;
+}
+.vapp-fullscreen-background .lbc-left-avatar .loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.vapp-fullscreen-background .lbc-left-avatar .fade-in {
+  animation: fadeIn 0.6s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.vapp-fullscreen-background .lbc-left-socialIconsContainer .lbc-social-bticon:hover {
+  transform: scale(1.2);
+}
+.vapp-fullscreen-background .clock-font {
+  font-family: "digitalfont";
+  font-weight: 800;
+}
+/* 添加一个::before伪元素降低背景图片的亮度，而不会影响background元素的其他内容 */
+.vapp-fullscreen-background::before {
+  content: "";
+  background-image: var(--lbc-background-image-url);
+  transition: background-image 0.8s ease;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  /* 调整亮度值  */
+  filter: brightness(var(--lbc-brightness));
+}
+.vapp-fullscreen-background.radius-before::before {
+  border-radius: 16px;
+}
