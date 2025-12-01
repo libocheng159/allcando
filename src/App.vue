@@ -25,7 +25,8 @@
     <div v-show="!isloading && !isClearScreen" :style="xs || sm ? { 'overflow-y': 'auto', 'overflow-x': 'hidden' } : {}">
       <v-row>
         <!-- 左侧个人信息栏 -->
-        <v-col cols="12" md="3" lg="3" class="lbc-left" align="center">
+        <v-col cols="12" class="lbc-left" align="center"
+  :style="!(xs || sm) ? { 'flex': '0 0 22%', 'max-width': '22%' } : {}">
           <!-- 欢迎 -->
           <div :style="xs || sm ? { 'font-size': '2.3rem' } : { 'display': 'none' }" class="lbc-left-welcome">{{
             configdata.welcometitle }}</div>
