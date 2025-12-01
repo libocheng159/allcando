@@ -25,7 +25,7 @@
     <div v-show="!isloading && !isClearScreen" :style="xs || sm ? { 'overflow-y': 'auto', 'overflow-x': 'hidden' } : {}">
       <v-row>
         <!-- 左侧个人信息栏 -->
-        <v-col cols="12" md="4" lg="3" class="lbc-left" align="center">
+        <v-col cols="12" md="3" lg="3" class="lbc-left" align="center">
           <!-- 欢迎 -->
           <div :style="xs || sm ? { 'font-size': '2.3rem' } : { 'display': 'none' }" class="lbc-left-welcome">{{
             configdata.welcometitle }}</div>
@@ -168,7 +168,7 @@
           </v-container>
         </v-col>
 
-        <v-col cols="12" md="8" lg="9" style="height: 100vh;" :style="xs || sm ? {} : { 'overflow': 'auto' }">
+        <v-col cols="12" md="9" lg="9" style="height: 100vh;" :style="xs || sm ? {} : { 'overflow': 'auto' }">
           <homeright :configdata=configdata :formattedTime=formattedTime :formattedDate=formattedDate
             :projectcards=projectcards></homeright>
         </v-col>
